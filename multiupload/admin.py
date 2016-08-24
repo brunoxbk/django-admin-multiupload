@@ -8,7 +8,7 @@ import json
 
 from django.contrib import admin
 from django.shortcuts import render, get_object_or_404
-from django.conf.urls import patterns,url
+from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -17,21 +17,21 @@ from django.views.decorators.csrf import csrf_exempt
 class MultiUploadAdmin(admin.ModelAdmin):
     class Media:
         js = (
-            'jquery/jquery.1.8.0.min.js',
-            'jquery/jquery_fix_csrf.js',
-            'jquery/jquery.ui.widget.js',
-            'jquery/tmpl.min.js',
-            'jquery/canvas-to-blob.min.js',
-            'jquery/load-image.min.js',
-            'jquery/jquery.iframe-transport.js',
-            'jquery/jquery.fileupload.js',
-            'jquery/jquery.fileupload-fp.js',
-            'jquery/jquery.fileupload-ui.js',
+            # 'jquery/jquery.1.8.0.min.js',
+            '/static/multi/jquery/jquery_fix_csrf.js',
+            '/static/multi/jquery/jquery.ui.widget.js',
+            '/static/multi/jquery/tmpl.min.js',
+            '/static/multi/jquery/canvas-to-blob.min.js',
+            '/static/multi/jquery/load-image.min.js',
+            '/static/multi/jquery/jquery.iframe-transport.js',
+            '/static/multi/jquery/jquery.fileupload.js',
+            '/static/multi/jquery/jquery.fileupload-fp.js',
+            '/static/multi/jquery/jquery.fileupload-ui.js',
         )
         css = {
-            'all': ['css/jquery-ui.css',
-                    'css/jquery.fileupload-ui.css',
-                    'css/multiupload.css',
+            'all': ['/static/multi//static/multi/css/jquery-ui.css',
+                    '/static/multi/css/jquery.fileupload-ui.css',
+                    '/static/multi/css/multiupload.css',
                     ],
         }
     change_form_template = 'multiupload/change_form.html'
@@ -104,19 +104,19 @@ class MultiUploadAdmin(admin.ModelAdmin):
         return '%s_%s_multiupload_form' % (app_name, self.get_model_name())
 
     def get_urls(self, *args, **kwargs):
-        multi_urls = patterns('')
+        multi_urls = []
         if self.multiupload_list:
-            multi_urls += patterns('',
+            multi_urls += [
                 url(r'^multiupload/$',
                     self.admin_site.admin_view(self.admin_upload_view),
                     name=self.get_multiupload_list_view_name())
-            )
+            ]
         if self.multiupload_form:
-            multi_urls += patterns('',
+            multi_urls += [
                 url(r'^(?P<id>\d+)/multiupload/$',
                     self.admin_site.admin_view(self.admin_upload_view),
                     name=self.get_multiupload_form_view_name()),
-            )
+            ]
         return multi_urls + super(MultiUploadAdmin, self).get_urls(*args,
                                                                    **kwargs)
 
@@ -244,14 +244,16 @@ class MultiUploadAdmin(admin.ModelAdmin):
                 # in this case is it a json True value
                 # if true is not returned, the file will not be
                 # removed from the upload queue
-                response_data = json.dumps(self.delete_file(request.GET.get("f"), request))
+                response_data = json.dumps(
+                    self.delete_file(request.GET.get("f"), request))
 
                 # return the result data
                 # here it always has to be json
-                return HttpResponse(response_data, content_type="application/json")
+                return HttpResponse(
+                    response_data, content_type="application/json")
 
         else:
-            #GET
+            # GET
             context = {
                 # these two are necessary to generate the jQuery templates
                 # they have to be included here since they conflict
