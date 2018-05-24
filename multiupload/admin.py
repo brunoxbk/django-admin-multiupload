@@ -8,8 +8,8 @@ import json
 
 from django.contrib import admin
 from django.shortcuts import render, get_object_or_404
-from django.conf.urls import patterns, url
-from django.core.urlresolvers import reverse
+from django.urls import path
+from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
@@ -66,7 +66,7 @@ class MultiUploadAdmin(admin.ModelAdmin):
                 object_id = context['object_id']
                 if object_id is not None:
                     context.update({
-                        'multiupload_form_url': reverse(
+                        'multiupload_form_url': reverse_lazy(
                             'admin:%s' % self.get_multiupload_form_view_name(),
                             args=[object_id, ]),
                     })
@@ -80,7 +80,7 @@ class MultiUploadAdmin(admin.ModelAdmin):
             'multiupload_list': self.multiupload_list,
         })
         if self.multiupload_list:
-            url = reverse('admin:%s' % self.get_multiupload_list_view_name())
+            url = reverse_lazy('admin:%s' % self.get_multiupload_list_view_name())
             if pop:
                 url += '?pop=1'
             extra_context.update({
@@ -107,13 +107,13 @@ class MultiUploadAdmin(admin.ModelAdmin):
         multi_urls = []
         if self.multiupload_list:
             multi_urls += [
-                url(r'^multiupload/$',
+                path('multiupload/',
                     self.admin_site.admin_view(self.admin_upload_view),
                     name=self.get_multiupload_list_view_name())
             ]
         if self.multiupload_form:
             multi_urls += [
-                url(r'^(?P<id>\d+)/multiupload/$',
+                path(r'<int:id>/multiupload/',
                     self.admin_site.admin_view(self.admin_upload_view),
                     name=self.get_multiupload_form_view_name()),
             ]
